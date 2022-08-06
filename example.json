@@ -1,0 +1,18 @@
+{
+    "君の知らない物語": {
+        "title": "君の知らない物語",
+        "artist": "supercell「化物語」",
+        "category": "流行&动漫",
+        "image_file": "f1fbe1553464d234.png",
+        "lev_bas": "3",
+        "lev_adv": "6.6",
+        "lev_exp": "8.6",
+        "lev_mas": "11",
+        "dx_lev_bas": "3",
+        "dx_lev_adv": "6.5",
+        "dx_lev_exp": "8.2",
+        "dx_lev_mas": "12",
+        "version": "GreeN",
+        "status": 15
+    }
+}
