@@ -1,4 +1,3 @@
-from unittest import result
 from nonebot.adapters import Message
 from nonebot import on_command, on_keyword, on_message
 from nonebot.rule import to_me
@@ -12,7 +11,7 @@ def find_song(args):
     with open(song_data_path, "r", encoding="utf-8") as f:
         data = json.loads(f.read())
     for title in data.keys():
-        if args in title:
+        if args[0] in title:
             answer = title
             break
     return show_song(answer,data)
