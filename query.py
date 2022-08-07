@@ -6,6 +6,11 @@ from nonebot.adapters import Bot, Event
 import json
 
 
+def help_sc():
+    help_ = ""
+    return help_
+
+
 def show_song(titles, data):
     """输入筛选的歌曲和数据库，转换成Message发送给用户
 
@@ -125,22 +130,20 @@ def range_select_song(args):
 def data_check(data):
     # 这里修改了一下，这次直接传进来的不包含'sc'，之前写的有点……
     """对数据进行检查和筛选"""
+    if data[0] == "help":
+        return help_sc()
     try:
         for i in range(len(data)):
             data[i] = float(data[i])
             if data[i] > 15.0 or data[i] < 1:
                 return "输入的数据大小有误！"
     except:
-        return "输入的数据有误！"
-    
+        return "输入的数据有误！请使用\"sc help\"获得提示"
+
     if len(data) == 4:
         if data[0] > data[1] or data[2] > data[3]:
             return "是否按照顺序输入？"
-    
-    elif len(data) == 2:
-        if data[0] > data[1]:
-            return "是否按照顺序输入？"
-    
+
     return data
 
 
@@ -155,7 +158,7 @@ def query_song(args):
 
     在使用时请自行设置json位置，修改内容为`song_data_path`
     """
-    
+
     result = data_check(args)
     if type(result) == str:
         return result
@@ -168,7 +171,6 @@ def query_song(args):
         return double_select_song(args)
     if len(args) == 4:
         return range_select_song(args)
-    
 
 
 spell = on_command("sc", aliases=set(["拼机"]), priority=5)
