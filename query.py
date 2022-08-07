@@ -7,17 +7,40 @@ import json
 
 
 def help_sc():
-    help_ = ""
+    help_ = "欢迎使用晨汐bot maimai拼机助手！\n使用方法：\n\t1.输入sc [定数]查询该定数的全部曲目\n\t2.输入sc [定数1] [定数2]查询难度同时包含定数1和定数2的曲目\n\t3.输入sc [定数1下界] [定数1上界] [定数2下界] [定数2上界]查询难度同时包含定数1的范围和定数2的范围的曲目\n\n曲名后有标注（DX）的为DX谱面，未标注为标准谱面"
     return help_
 
 
-def show_song(titles, data):
+def show_song(titles, data, *etc):
     """输入筛选的歌曲和数据库，转换成Message发送给用户
 
     参数：
         titles: 歌曲标题，以'd'或者'l'开始，用以区分DX与普通
         data: 歌曲数据库
     """
+
+    if etc != tuple([]):
+        lines = ""
+        tags = {"l": ["lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_remas"],
+                "d": ["dx_lev_bas", "dx_lev_adv", "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]}
+        for title in titles:
+            tmp_title = title[1:]
+            line = f"{tmp_title} "
+            if title[0] == "d":
+                line += "（DX） "
+            line += str(etc[0])
+
+            for tag in tags[title[0]]:
+                try:
+                    if float(data[tmp_title][tag]) == float(etc[0]):
+                        dicts = {"lev_bas": "（绿）", "lev_adv": "（黄）", "lev_exp": "（红）", "lev_mas": "（紫）", "lev_remas": "（白）",
+                                 "dx_lev_bas": "（绿）", "dx_lev_adv": "（黄）", "dx_lev_exp": "（红）", "dx_lev_mas": "（紫）", "dx_lev_remas": "（白）"}
+                        line += f" {dicts[tag]} "
+                except:
+                    continue
+            line += "\n"
+            lines += line
+        return "为您找到以下歌曲：" + lines
 
     lines = ""
     for title in titles:
@@ -41,7 +64,38 @@ def show_song(titles, data):
 
 
 def select_song(args):
-    pass
+    # pass
+    song_data_path = "/home/maimai/SCHelper/src/plugins/output.json"
+    tags = ["lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_remas"]
+    answer = []
+    songs = {}
+    with open(song_data_path, "r", encoding="utf-8") as f:
+        songs = json.loads(f.read())
+
+    for song in songs.keys():
+        flag1 = 0
+        for tag in tags:
+            try:
+                if float(songs[song][tag]) == args[0]:
+                    flag1 += 1
+            except Exception as e:
+                pass
+        if flag1 >= 1:
+            answer.append("l" + song)
+
+    tags = ["dx_lev_bas", "dx_lev_adv",
+            "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]
+    for song in songs.keys():
+        flag1 = 0
+        for tag in tags:
+            try:
+                if float(songs[song][tag]) == args[0]:
+                    flag1 += 1
+            except:
+                pass
+        if flag1 >= 1:
+            answer.append("d" + song)
+    return show_song(answer, songs, args[0])
 
 
 def double_select_song(args):
@@ -182,6 +236,25 @@ async def spell_chicken(bot: Bot, event: Event):
     data = str(event.get_message()).split(" ")[1:]
     try:
         await bot.send(event=event, message=query_song(data))
-    except Exception:
+    except Exception as e:
+        #await bot.send(event=event, message=str(e))
         await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
         return
+
+def find_song(args):
+    song_data_path = "/home/maimai/SCHelper/src/plugins/output.json"
+    return
+
+
+query = on_command("f", aliases=set(["查询"]), priority=5)
+
+@query.handle()
+async def find(bot: Bot, event: Event):
+    data = str(event.get_message()).split(" ")[1:]
+    try:
+        await bot.send(event=event, message=find_song(data))
+    except Exception as e:
+        #await bot.send(event=event, message=str(e))
+        await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
+        return    
+    # await bot.send(event=event, message="Hello!")
