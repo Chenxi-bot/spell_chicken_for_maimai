@@ -11,20 +11,20 @@ def show_song(titles, data):
         tmp_title = title[1:]
         line = f"\n{tmp_title}"
         if title[0] == "d":
-            line += "（dx难度）"
+            line += "（DX）"
         line += ": \n"
         tags = {"l": ["lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_remas"],
                 "d": ["dx_lev_bas", "dx_lev_adv", "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]}
         for tag in tags[title[0]]:
             try:
-                line += f"/ {data[tmp_title][tag]}"
+                line += f"/{data[tmp_title][tag]}"
             except:
                 pass
         lines += line
     if lines == "":
         return "抱歉，没有符合条件的歌曲"
     else:
-        return "为您找到以下歌曲：\n" + lines
+        return "为您找到以下歌曲：" + lines
 
 
 def query_song(args):
@@ -37,36 +37,69 @@ def query_song(args):
     # songs[title] = song_data
     # 其中song_data的结构中至少包含以下键值
     # "title", (("lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_remas") or/and ("dx_lev_bas", "dx_lev_adv", "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"))
-    for song in songs.keys():
-        flag1 = 0
-        flag2 = 0
-        for tag in tags:
-            try:
-                if float(songs[song][tag]) <= args[1] and float(songs[song][tag]) >= args[0]:
-                    flag1 += 1
-                if float(songs[song][tag]) <= args[3] and float(songs[song][tag]) >= args[2]:
-                    flag2 += 1
-            except Exception as e:
-                pass
-        if flag1 >= 1 and flag2 >= 1:
-            answer.append("l" + song)
+    if len(args) == 4: 
+        for song in songs.keys():
+            flag1 = 0
+            flag2 = 0
+            for tag in tags:
+                try:
+                    if float(songs[song][tag]) <= args[1] and float(songs[song][tag]) >= args[0]:
+                        flag1 += 1
+                    if float(songs[song][tag]) <= args[3] and float(songs[song][tag]) >= args[2]:
+                        flag2 += 1
+                except Exception as e:
+                    pass
+            if flag1 >= 1 and flag2 >= 1:
+                answer.append("l" + song)
 
-    tags = ["dx_lev_bas", "dx_lev_adv",
-            "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]
-    for song in songs.keys():
-        flag1 = 0
-        flag2 = 0
-        for tag in tags:
-            try:
-                if float(songs[song][tag]) <= args[1] and float(songs[song][tag]) >= args[0]:
-                    flag1 += 1
-                if float(songs[song][tag]) <= args[3] and float(songs[song][tag]) >= args[2]:
-                    flag2 += 1
-            except:
-                pass
-        if flag1 >= 1 and flag2 >= 1:
-            answer.append("d" + song)
-    return show_song(answer, songs)
+        tags = ["dx_lev_bas", "dx_lev_adv",
+                "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]
+        for song in songs.keys():
+            flag1 = 0
+            flag2 = 0
+            for tag in tags:
+                try:
+                    if float(songs[song][tag]) <= args[1] and float(songs[song][tag]) >= args[0]:
+                        flag1 += 1
+                    if float(songs[song][tag]) <= args[3] and float(songs[song][tag]) >= args[2]:
+                        flag2 += 1
+                except:
+                    pass
+            if flag1 >= 1 and flag2 >= 1:
+                answer.append("d" + song)
+        return show_song(answer, songs)
+    #此处新增了一个情况，是输入两个数字的搜索方法
+    elif len(args) == 2: 
+        for song in songs.keys():
+            flag1 = 0
+            flag2 = 0
+            for tag in tags:
+                try:
+                    if float(songs[song][tag]) == args[0]:
+                        flag1 += 1
+                    if float(songs[song][tag]) == args[1]:
+                        flag2 += 1
+                except Exception as e:
+                    pass
+            if flag1 >= 1 and flag2 >= 1:
+                answer.append("l" + song)
+
+        tags = ["dx_lev_bas", "dx_lev_adv",
+                "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]
+        for song in songs.keys():
+            flag1 = 0
+            flag2 = 0
+            for tag in tags:
+                try:
+                    if float(songs[song][tag]) == args[0]:
+                        flag1 += 1
+                    if float(songs[song][tag]) == args[1]:
+                        flag2 += 1
+                except:
+                    pass
+            if flag1 >= 1 and flag2 >= 1:
+                answer.append("d" + song)
+        return show_song(answer, songs)
 
 
 spell = on_command("sc", aliases=set(["拼机"]), priority=5)
@@ -77,26 +110,48 @@ async def spell_chicken(bot: Bot, event: Event):
     # 对收到的参数进行分割
     data = str(event.get_message()).split(" ")
     # 对参数检验，参数数量是否为4
-    if len(data) != 5:
+    if len(data) != 5 and len(data) != 2 and len(data) != 3:
         notice = "错误的格式！\n参考：/拼机 定数范围1 定数范围2 定数范围3 定数范围4"
         await bot.send(event=event, message=notice)
         return
-    data = data[1:]
-    # 对参数检验，输入是否为浮点数
-    try:
-        for i in range(len(data)):
-            data[i] = float(data[i])
-            if data[i] > 15.0 or data[i] < 1:
-                await bot.send(event=event, message="输入的数据大小有误！")
-                return
-
-        if data[0] > data[1] or data[2] > data[3]:
-            await bot.send(event=event, message="是否按照顺序输入？")
+    if len(data) == 3:
+        data = data[1:]
+        # 对参数检验，输入是否为浮点数
+        try:
+            for i in range(len(data)):
+                data[i] = float(data[i])
+                if data[i] > 15.0 or data[i] < 1:
+                    await bot.send(event=event, message="输入的数据大小有误！")
+                    return
+        except Exception as e:
+            await bot.send(event=event, message=f"输入的数据有误！")
             return
-    except Exception as e:
-        await bot.send(event=event, message=f"输入的数据有误！")
+        try:
+            await bot.send(event=event, message=query_song(data))
+        except Exception:
+            await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
+
         return
-    try:
-        await bot.send(event=event, message=query_song(data))
-    except Exception:
-        await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
+    if len(data) == 5:
+        data = data[1:]
+        # 对参数检验，输入是否为浮点数
+        try:
+            for i in range(len(data)):
+                data[i] = float(data[i])
+                if data[i] > 15.0 or data[i] < 1:
+                    await bot.send(event=event, message="输入的数据大小有误！")
+                    return
+
+            if data[0] > data[1] or data[2] > data[3]:
+                await bot.send(event=event, message="是否按照顺序输入？")
+                return
+        except Exception as e:
+            await bot.send(event=event, message=f"输入的数据有误！")
+            return
+        try:
+            await bot.send(event=event, message=query_song(data))
+        except Exception:
+            await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
+
+
+    
