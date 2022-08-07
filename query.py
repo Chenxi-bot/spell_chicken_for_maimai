@@ -25,7 +25,7 @@ def show_song(titles, data, *etc):
                 "d": ["dx_lev_bas", "dx_lev_adv", "dx_lev_exp", "dx_lev_mas", "dx_lev_remas"]}
         for title in titles:
             tmp_title = title[1:]
-            line = f"{tmp_title} "
+            line = f"\n{tmp_title} "
             if title[0] == "d":
                 line += "（DX） "
             line += str(etc[0])
@@ -38,7 +38,6 @@ def show_song(titles, data, *etc):
                         line += f" {dicts[tag]} "
                 except:
                     continue
-            line += "\n"
             lines += line
         return "为您找到以下歌曲：" + lines
 
@@ -240,21 +239,3 @@ async def spell_chicken(bot: Bot, event: Event):
         #await bot.send(event=event, message=str(e))
         await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
         return
-
-def find_song(args):
-    song_data_path = "/home/maimai/SCHelper/src/plugins/output.json"
-    return
-
-
-query = on_command("f", aliases=set(["查询"]), priority=5)
-
-@query.handle()
-async def find(bot: Bot, event: Event):
-    data = str(event.get_message()).split(" ")[1:]
-    try:
-        await bot.send(event=event, message=find_song(data))
-    except Exception as e:
-        #await bot.send(event=event, message=str(e))
-        await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
-        return    
-    # await bot.send(event=event, message="Hello!")
