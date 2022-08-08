@@ -18,6 +18,8 @@ def find_song(args):
 
 
 def show_song(title, data):
+    if title == "":
+        return "抱歉，没有符合条件的歌曲"
     line = ""
     for tag in data[title].keys():
         if tag == "title":
@@ -34,10 +36,7 @@ def show_song(title, data):
             line += "\n版本："
         if tag != "image_file" and tag != "status":
             line += f"{data[title][tag]} "
-    if line == "":
-        return "抱歉，没有符合条件的歌曲"
-    else:
-        return "为您找到以下歌曲：\n" + line
+    return "为您找到以下歌曲：\n" + line
 
 
 query = on_command("f", aliases=set(["查询"]), priority=5)

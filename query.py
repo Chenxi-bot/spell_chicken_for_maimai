@@ -69,7 +69,17 @@ def show_song(titles, data, *etc):
 
 
 def select_song(args):
+    # 模糊搜索，调用第三个函数
+    # 对于sc 14，相当于sc 14.0 14.6 14.0 14.6
+    if "." not in args[0]:
+        ranks = {
+            "1": [1.0, 1.9], "2": [2.0, 2.9], "3": [3.0, 3.9], "4": [4.0, 4.9], "5": [5.0, 5.9], "6": [6.0, 6.9], "7": [7.0, 7.6], "7+": [7.7, 7.9], "8": [8.0, 8.6], "8+": [8.7, 8.9],
+            "9": [9.0, 9.6], "9+": [9.7, 9.9], "10": [10.0, 10.6], "10+": [10.7, 10.9], "11": [11.0, 11.6], "11+": [11.7, 11.9], "12": [12.0, 12.6], "12+": [12.7, 12.9],
+            "13": [13.0, 13.6], "13+": [13.7, 13.9], "14": [14.0, 14.6], "14+": [14.7, 14.9], "15": [15.0, 15.0]
+        }
+        return range_select_song([ranks[args[0]][0], ranks[args[0]][1],ranks[args[0]][0],ranks[args[0]][1]])
     # pass
+    args[0] = float(args[0])
     song_data_path = "/home/maimai/SCHelper/src/plugins/output.json"
     tags = ["lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_remas"]
     answer = []
@@ -186,9 +196,11 @@ def range_select_song(args):
     return show_song(answer, songs)
 
 
-def data_check(data):
+def data_check(data, keep_str = False):
     # 这里修改了一下，这次直接传进来的不包含'sc'，之前写的有点……
     """对数据进行检查和筛选"""
+    if "+" in data[0]:
+        return data
     if data[0] == "help":
         return help_sc()
     try:
@@ -217,19 +229,17 @@ def query_song(args):
 
     在使用时请自行设置json位置，修改内容为`song_data_path`
     """
-
+    basic = args[:]
     result = data_check(args)
     if type(result) == str:
         return result
-    else:
-        args = result
 
     if len(args) == 1:
-        return select_song(args)
+        return select_song(basic)
     if len(args) == 2:
-        return double_select_song(args)
+        return double_select_song(result)
     if len(args) == 4:
-        return range_select_song(args)
+        return range_select_song(result)
 
 
 spell = on_command("sc", aliases=set(["拼机"]), priority=5)
@@ -242,6 +252,6 @@ async def spell_chicken(bot: Bot, event: Event):
     try:
         await bot.send(event=event, message=query_song(data))
     except Exception as e:
-        # await bot.send(event=event, message=str(e))
+        # await bot.send(event=event, message=(str(e)))
         await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
         return
