@@ -1,4 +1,3 @@
-from unittest import result
 from nonebot.adapters import Message
 from nonebot import on_command, on_keyword, on_message
 from nonebot.rule import to_me
@@ -7,7 +6,13 @@ import json
 
 
 def help_sc():
-    help_ = "欢迎使用晨汐bot maimai拼机助手！\n使用方法：\n\t1.输入sc [定数]查询该定数的全部曲目\n\t2.输入sc [定数1] [定数2]查询难度同时包含定数1和定数2的曲目\n\t3.输入sc [定数1下界] [定数1上界] [定数2下界] [定数2上界]查询难度同时包含定数1的范围和定数2的范围的曲目\n\n曲名后有标注（DX）的为DX谱面，未标注为标准谱面"
+    help_ = """欢迎使用晨汐bot maimai拼机助手！
+使用方法：
+    1.输入sc [定数]查询该定数的全部曲目
+    2.输入sc [定数1] [定数2]查询难度同时包含定数1和定数2的曲目
+    3.输入sc [定数1下界] [定数1上界] [定数2下界] [定数2上界]查询难度同时包含定数1的范围和定数2的范围的曲目
+    
+    曲名后有标注（DX）的为DX谱面，未标注为标准谱面"""
     return help_
 
 
@@ -236,6 +241,6 @@ async def spell_chicken(bot: Bot, event: Event):
     try:
         await bot.send(event=event, message=query_song(data))
     except Exception as e:
-        #await bot.send(event=event, message=str(e))
+        # await bot.send(event=event, message=str(e))
         await bot.send(event=event, message="您输入的范围过大，由于QQ字数限制目前无法显示，请缩小查询范围")
         return
